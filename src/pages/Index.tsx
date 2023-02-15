@@ -1,29 +1,25 @@
-import { Axios } from "axios";
 import { useEffect, useState } from "react";
+import { client } from "../client";
+import { useRouter } from "../router";
 
-const axios = new Axios({
-  baseURL: "http://localhost:9000",
-  withCredentials: true,
-  transformResponse: (x) => JSON.parse(x),
-  headers: { "Content-Type": "application/json" },
-});
-
-export default function App() {
+export function Index() {
+  const router = useRouter();
   const [serverData, setServerData] = useState<string[] | null>(null);
   const [inputBox, setInputBox] = useState("");
 
   useEffect(() => {
-    axios.get("/posts/").then(({ data }) => {
-      setServerData(data.result);
-    });
+    client["/post"]["/"].get({}).then((res) => setServerData(res.map((e) => e.content)));
   }, []);
 
   async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
     if (inputBox === "") return;
 
-    const { data } = await axios.post("/posts/", JSON.stringify({ content: inputBox }));
-    setServerData(data.result);
+    const res = await client["/post"]["/"].post({
+      body: { content: inputBox },
+    });
+
+    setServerData(res.map((e) => e.content));
   }
 
   if (serverData === null) return <h1>loading...</h1>;
@@ -38,7 +34,13 @@ export default function App() {
       <div className="posts_container">
         {serverData.map((e, idx) => {
           return (
-            <div className="post" key={idx}>
+            <div
+              className="post"
+              key={idx}
+              onClick={() => {
+                router["/post"]["/:post_id"].use({ post_id: `${idx}` });
+              }}
+            >
               <h1>{e}</h1>
             </div>
           );

@@ -10,14 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@scinorandex/erpc": "^0.0.3",
+    "@scinorandex/erpc": "0.1.1",
     "@scinorandex/react-router": "^0.0.1",
+    "@scinorandex/rpscin": "0.0.1",
     "@scinorandex/scider": "^0.0.1",
     "axios": "^1.3.2",
+    "buffer": "^6.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass": "^1.58.0",
-    "zod": "^3.20.2"
+    "zod": "3.20.2"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
