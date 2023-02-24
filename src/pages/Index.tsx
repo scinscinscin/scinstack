@@ -1,51 +1,50 @@
-import { useEffect, useState } from "react";
-import { client } from "../client";
-import { useRouter } from "../router";
+import { useState } from "react";
+import { api, useRouter, cache } from "../utils/Controller";
+import { useLoader } from "@scinorandex/loader";
+import { useMutation } from "@scinorandex/query";
 
-export function Index() {
-  const router = useRouter();
-  const [serverData, setServerData] = useState<string[] | null>(null);
-  const [inputBox, setInputBox] = useState("");
+export const Index = useLoader({
+  fetchFn: () => cache.fetch("main", () => api["/post"]["/"].get({})),
 
-  useEffect(() => {
-    client["/post"]["/"].get({}).then((res) => setServerData(res.map((e) => e.content)));
-  }, []);
+  SuccessFunction: ({ data }) => {
+    const router = useRouter();
+    const [inputBox, setInputBox] = useState("");
+    const { mutate } = useMutation({ invalidationKey: "main_post_feed", mutationFn: api["/post"]["/"].post });
 
-  async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.preventDefault();
-    if (inputBox === "") return;
+    async function submit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+      e.preventDefault();
+      if (inputBox === "") return;
+      const response = await mutate({ body: { content: inputBox } });
+      console.log(inputBox, response);
+    }
 
-    const res = await client["/post"]["/"].post({
-      body: { content: inputBox },
-    });
+    return (
+      <div className="container">
+        <div className="form_container">
+          <input
+            placeholder="Enter your new post here"
+            value={inputBox}
+            onChange={(e) => setInputBox(e.target.value)}
+          />
+          <button onClick={submit}>Create new post</button>
+        </div>
 
-    setServerData(res.map((e) => e.content));
-  }
-
-  if (serverData === null) return <h1>loading...</h1>;
-
-  return (
-    <div className="container">
-      <div className="form_container">
-        <input placeholder="Enter your new post here" value={inputBox} onChange={(e) => setInputBox(e.target.value)} />
-        <button onClick={submit}>Create new post</button>
+        <div className="posts_container">
+          {data.map((post, idx) => {
+            return (
+              <div
+                className="post"
+                key={idx}
+                onClick={() => {
+                  router["/post"]["/:post_uuid"].use({ post_uuid: post.uuid });
+                }}
+              >
+                <h1>{post.content}</h1>
+              </div>
+            );
+          })}
+        </div>
       </div>
-
-      <div className="posts_container">
-        {serverData.map((e, idx) => {
-          return (
-            <div
-              className="post"
-              key={idx}
-              onClick={() => {
-                router["/post"]["/:post_id"].use({ post_id: `${idx}` });
-              }}
-            >
-              <h1>{e}</h1>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+    );
+  },
+});

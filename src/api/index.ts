@@ -1,6 +1,7 @@
 import { baseProcedure } from "@scinorandex/erpc";
 import { Router, Server } from "@scinorandex/rpscin";
 import { z } from "zod";
+import { db } from "./prisma";
 
 const unTypeSafeRouter = Router("/").config({});
 
@@ -15,21 +16,21 @@ const userRouter = unTypeSafeRouter.subroute("/user").config({
   },
 });
 
-const posts: { content: string }[] = [{ content: "Lorem Ipsum" }];
-
 const postRouter = unTypeSafeRouter.subroute("/post").config({
   "/": {
-    get: baseProcedure.use(async () => posts),
+    get: baseProcedure.use(() => db.post.findMany()),
+
     post: baseProcedure.input(z.object({ content: z.string() })).use(async (req, res, { input }) => {
-      posts.push(input);
-      return posts;
+      await db.post.create({ data: { content: input.content } });
+      return await db.post.findMany();
     }),
   },
 
-  "/:id": {
+  "/:uuid": {
     get: baseProcedure.use(async (req) => {
-      const id = parseInt(req.params.id, 10);
-      return posts[id];
+      const post = await db.post.findFirst({ where: { uuid: req.params.uuid } });
+      if (post) return post;
+      else throw new Error("Was not able to find a post with that id");
     }),
   },
 });
