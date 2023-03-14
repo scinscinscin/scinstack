@@ -2,10 +2,11 @@ import type { AppRouter } from "../api";
 import "buffer/";
 import { useContext } from "react";
 import { Client } from "@scinorandex/rpscin/dist/client";
+import { Browser } from "../../../packages/rpscin/src/envs/browser";
 import { Router, RouterClient, routerRendererContext } from "@scinorandex/react-router";
 import { generateQueryProvider } from "@scinorandex/query";
 
-export const api = Client<AppRouter>({ apiLink: "http://localhost:9000" });
+export const api = Client<AppRouter>({ apiLink: "http://localhost:9000", serializer: Browser.serializer });
 export const cache = generateQueryProvider(true);
 
 /**

@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@prisma/client": "^4.10.1",
-    "@scinorandex/erpc": "0.1.1",
+    "@scinorandex/erpc": "0.2.1",
     "@scinorandex/loader": "^0.0.2",
     "@scinorandex/query": "^0.0.3",
     "@scinorandex/react-router": "^0.0.1",
-    "@scinorandex/rpscin": "0.0.1",
+    "@scinorandex/rpscin": "0.1.0",
     "@scinorandex/scider": "^0.0.1",
     "buffer": "^6.0.3",
     "react": "^18.2.0",

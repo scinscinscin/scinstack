@@ -1,4 +1,4 @@
-import { baseProcedure } from "@scinorandex/erpc";
+import { baseProcedure, zodFile } from "@scinorandex/erpc";
 import { Router, Server } from "@scinorandex/rpscin";
 import { z } from "zod";
 import { db } from "./prisma";
@@ -13,6 +13,12 @@ const userRouter = unTypeSafeRouter.subroute("/user").config({
         console.log("Creating user: ", input);
         return { user: { username: input.username } };
       }),
+  },
+  "/image_upload": {
+    put: baseProcedure.input(z.object({ image: zodFile("image/png") })).use(async (req, res, { input }) => {
+      console.log("received image", input);
+      return true;
+    }),
   },
 });
 
